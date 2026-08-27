@@ -28,7 +28,7 @@ parts:
       set -eu
       version="$(craftctl get version)"
       tag="v${version}"
-      asset="mdns-tui-browser-${version}-Linux-x86_64.tar.gz"
+      asset="mdns-tui-browser-v${version}-Linux-x86_64.tar.gz"
       url="https://github.com/hrzlgnm/mdns-tui-browser/releases/download/${tag}/${asset}"
 
       curl -fsSL -o release.tar.gz "$url"
