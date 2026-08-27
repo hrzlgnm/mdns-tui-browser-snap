@@ -1,0 +1,51 @@
+# Copyright 2026 hrzlgnm
+# SPDX-License-Identifier: MIT-0
+
+name: mdns-tui-browser
+base: core24
+# Replaced by CI with the version being packaged.
+version: '0.0.0'
+summary: A TUI browser for mDNS service discovery
+description: |
+  A terminal UI for browsing services advertised via mDNS on your local
+  network.
+grade: stable
+confinement: strict
+platforms:
+  amd64:
+
+apps:
+  mdns-tui-browser:
+    command: bin/mdns-tui-browser
+    plugs:
+      - network
+      - network-bind
+
+parts:
+  mdns-tui-browser:
+    plugin: nil
+    override-build: |
+      set -eu
+      version="$(craftctl get version)"
+      tag="v${version}"
+      asset="mdns-tui-browser-${version}-Linux-x86_64.tar.gz"
+      url="https://github.com/hrzlgnm/mdns-tui-browser/releases/download/${tag}/${asset}"
+
+      curl -fsSL -o release.tar.gz "$url"
+
+      # Verify against the inline sha256 digest GitHub computes for the asset.
+      expected="$(curl -fsSL "https://api.github.com/repos/hrzlgnm/mdns-tui-browser/releases/tags/${tag}" \
+          | jq -r --arg asset "$asset" '.assets[] | select(.name == $asset) | .digest')"
+      expected="${expected#sha256:}"
+      printf '%s  %s\n' "$expected" release.tar.gz | sha256sum --check --status
+
+      root="${asset%.tar.gz}"
+      tar xzf release.tar.gz
+      install -Dm755 "${root}/mdns-tui-browser" \
+          "$CRAFT_PART_INSTALL/bin/mdns-tui-browser"
+      install -Dm644 "${root}/man/man1/mdns-tui-browser.1" \
+          "$CRAFT_PART_INSTALL/share/man/man1/mdns-tui-browser.1"
+    build-packages:
+      - ca-certificates
+      - curl
+      - jq
