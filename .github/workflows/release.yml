@@ -35,13 +35,13 @@ jobs:
         shell: bash
 
       - name: Build snap
-        run: sudo snapcraft --use-lxd --verbosity=brief
+        run: sudo snapcraft pack --use-lxd --verbosity=brief
         shell: bash
 
       - name: Upload snap artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: snap-amd64
+          name: mdns-tui-browser-amd64
           path: "*.snap"
           if-no-files-found: error
 
@@ -57,7 +57,7 @@ jobs:
       - name: Download snap artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
-          name: snap-amd64
+          name: mdns-tui-browser-amd64
 
       - name: Install and launch check in container
         run: |
@@ -93,7 +93,7 @@ jobs:
         if: env.SNAPCRAFT_STORE_CREDENTIALS != ''
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
-          name: snap-amd64
+          name: mdns-tui-browser-amd64
 
       - name: Upload to stable channel
         if: env.SNAPCRAFT_STORE_CREDENTIALS != ''

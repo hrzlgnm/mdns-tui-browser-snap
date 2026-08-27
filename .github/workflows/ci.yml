@@ -41,12 +41,12 @@ jobs:
         shell: bash
 
       - name: Build snap
-        run: sudo snapcraft --use-lxd --verbosity=brief
+        run: sudo snapcraft pack --use-lxd --verbosity=brief
         shell: bash
 
       - name: Upload snap artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: snap-amd64
+          name: mdns-tui-browser-amd64
           path: "*.snap"
           if-no-files-found: error
