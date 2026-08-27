@@ -1,5 +1,5 @@
 # Copyright 2026 hrzlgnm
-# SPDX-License-Identifier: MIT-0
+# SPDX-License-Identifier: MIT
 
 name: mdns-tui-browser
 base: core24
@@ -11,6 +11,7 @@ description: |
   network.
 grade: stable
 confinement: strict
+license: MIT
 platforms:
   amd64:
 
