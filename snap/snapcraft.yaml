@@ -25,6 +25,12 @@ apps:
 parts:
   mdns-tui-browser:
     plugin: nil
+    # Inject the workflow token into the LXD build environment so the
+    # gh attestation verify call (which requires a token even for public
+    # repos) can authenticate. Snapcraft does not forward host env vars
+    # into the --use-lxd container on its own.
+    build-environment:
+      - GH_TOKEN: ${GH_TOKEN}
     override-build: |
       set -eu
       version="$(craftctl get version)"
