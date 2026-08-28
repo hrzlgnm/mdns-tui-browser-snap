@@ -9,7 +9,7 @@ description: |
 
 inputs:
   repo:
-    description: owner/repo that published the attestation, e.g. hrzlgnm/zux
+    description: owner/repo that published the attestation, e.g. hrzlgnm/mdns-tui-browser
     required: true
   asset:
     description: release asset filename to fetch the attestation for

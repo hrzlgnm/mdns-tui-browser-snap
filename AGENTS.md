@@ -30,10 +30,6 @@ We verify with `gh attestation verify` using the **offline bundle** flow:
   the host, so at build time it becomes `GH_TOKEN="${GH_TOKEN}"` and fails
   under `set -u` with `GH_TOKEN: unbound variable`. This is why the offline
   bundle approach exists instead.
-- The **project directory is mounted into the LXD container** and is reachable
-  inside the build at `$SNAPCRAFT_PROJECT_DIR`. So files we generate on the
-  host runner (the bundle + `trusted_root.jsonl`) are visible to the build
-  without any env plumbing.
 
 ### Versioned asset (unlike the sibling snaps)
 
@@ -63,7 +59,10 @@ as well.)
 Before `snapcraft pack`, **`.github/actions/fetch-attestation`** downloads the
 versioned asset, runs `gh attestation download` + `gh attestation
 trusted-root`, and writes the bundle (`sha256*.jsonl`) and `trusted_root.jsonl`
-into the project dir. It takes `repo`, `asset`, and `tag`.
+into the project dir. It takes `repo`, `asset`, and `tag`. The **project
+directory is mounted into the LXD container** (`$SNAPCRAFT_PROJECT_DIR`), so
+files we generate on the host runner are visible to the build without any env
+plumbing.
 
 > This is a **per-repo local copy** (duplicated in each snap repo that uses
 > the offline bundle flow). It is intentionally **not** shared via
@@ -114,3 +113,22 @@ bundle="$(ls "$SNAPCRAFT_PROJECT_DIR"/sha256*.jsonl | head -1)"
   --bundle` with an empty gh config proved otherwise. Prefer a quick local
   test over a guess.
 - Keep the host fetch step in sync between `ci.yml` and `release.yml`.
+
+## Sibling repos (same pattern)
+
+The same offline-bundle verification is applied across the snap repos that
+repackage prebuilt upstream binaries. Each now has its own `AGENTS.md`:
+
+- `mdns-browser-snap` — binary attestation over `mdns-browser_linux_x64`,
+  cert pinned to `desktop-reusable.yml`, no `--source-digest`. Uses
+  `pin-upstream-tag`.
+- `zux-snap` — binary attestation over `zux_linux_x64`, cert pinned to
+  `release.yml`, no `--source-digest`. Uses `pin-upstream-tag`.
+
+## Shared action
+
+The actual `snapcraft pack` invocation lives in the shared
+`hrzlgnm/actions/.github/actions/build-snap` (referenced as `@v2.7.0` from
+`release.yml`). `v2.7.0` runs `sudo env GH_TOKEN="$GH_TOKEN" snapcraft pack
+--use-lxd`; it does **not** inject a token (not needed with the offline
+bundle approach). `ci.yml` calls `snapcraft pack` directly instead.
