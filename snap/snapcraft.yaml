@@ -5,10 +5,15 @@ name: mdns-tui-browser
 base: core24
 # Replaced by CI with the version being packaged.
 version: '0.0.0'
+title: mDNS TUI Browser
 summary: A TUI browser for mDNS service discovery
 description: |
   A terminal UI for browsing services advertised via mDNS on your local
   network.
+website: https://github.com/hrzlgnm/mdns-tui-browser
+issues: https://github.com/hrzlgnm/mdns-tui-browser/issues
+source-code: https://github.com/hrzlgnm/mdns-tui-browser
+contact: https://github.com/hrzlgnm
 grade: stable
 confinement: strict
 license: MIT
