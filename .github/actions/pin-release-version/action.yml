@@ -8,10 +8,18 @@ inputs:
     description: Upstream tag to pin, e.g. v1.34.2. Defaults to the latest upstream release.
     required: false
     default: ""
+outputs:
+  tag:
+    description: The upstream release tag that was pinned
+    value: ${{ steps.pin.outputs.tag }}
+  asset:
+    description: The release asset filename for the pinned version
+    value: ${{ steps.pin.outputs.asset }}
 runs:
   using: composite
   steps:
-    - shell: bash
+    - id: pin
+      shell: bash
       env:
         GH_TOKEN: ${{ github.token }}
         INPUT_TAG: ${{ inputs.tag }}
@@ -32,3 +40,5 @@ runs:
         sed -i "s|^version:.*|version: '$VERSION'|" snap/snapcraft.yaml
         echo "Pinned snap version to $VERSION (tag $TAG):"
         grep '^version:' snap/snapcraft.yaml
+        echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+        echo "asset=mdns-tui-browser-${TAG}-Linux-x86_64.tar.gz" >> "$GITHUB_OUTPUT"

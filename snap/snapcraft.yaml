@@ -25,12 +25,6 @@ apps:
 parts:
   mdns-tui-browser:
     plugin: nil
-    # Inject the workflow token into the LXD build environment so the
-    # gh attestation verify call (which requires a token even for public
-    # repos) can authenticate. Snapcraft does not forward host env vars
-    # into the --use-lxd container on its own.
-    build-environment:
-      - GH_TOKEN: ${GH_TOKEN}
     override-build: |
       set -eu
       version="$(craftctl get version)"
@@ -40,9 +34,11 @@ parts:
 
       curl -fsSL -o release.tar.gz "$url"
 
-      # Verify the tarball's SLSA build provenance: proves it was produced
-      # by the upstream release workflow from the tagged source, not merely
-      # that it matches the digest GitHub lists for the release asset.
+      # Verify the tarball's SLSA build provenance offline. The attestation
+      # bundle and Sigstore trusted root are fetched on the runner (which has
+      # a token) and mounted into this LXD build container via the project
+      # directory, so gh attestation verify --bundle --custom-trusted-root
+      # runs fully offline (no auth, no network); no GH_TOKEN is needed here.
       # core24's apt `gh` (2.45) predates the `attestation` subcommand, so
       # fetch a static CLI build and pin its checksum.
       gh_ver=2.98.0
@@ -55,8 +51,11 @@ parts:
       tar -xzf "$gh_tarball"
       gh_bin="$(pwd)/gh_${gh_ver}_linux_amd64/bin/gh"
 
+      bundle="$(ls "$SNAPCRAFT_PROJECT_DIR"/sha256*.jsonl | head -1)"
       "$gh_bin" attestation verify release.tar.gz \
         --repo hrzlgnm/mdns-tui-browser \
+        --bundle "$bundle" \
+        --custom-trusted-root "$SNAPCRAFT_PROJECT_DIR/trusted_root.jsonl" \
         --cert-identity "https://github.com/hrzlgnm/mdns-tui-browser/.github/workflows/build-reusable.yml@refs/tags/${tag}"
 
       root="${asset%.tar.gz}"

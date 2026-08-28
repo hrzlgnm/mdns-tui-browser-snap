@@ -31,7 +31,15 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Pin snap version to latest upstream release
+        id: pin
         uses: ./.github/actions/pin-release-version
+
+      - name: Fetch attestation bundle
+        uses: ./.github/actions/fetch-attestation
+        with:
+          repo: hrzlgnm/mdns-tui-browser
+          tag: ${{ steps.pin.outputs.tag }}
+          asset: ${{ steps.pin.outputs.asset }}
 
       - name: Setup LXD
         uses: canonical/setup-lxd@8c6a87bfb56aa48f3fb9b830baa18562d8bfd4ee # v1

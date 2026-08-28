@@ -23,9 +23,17 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Pin snap version to upstream release
+        id: pin
         uses: ./.github/actions/pin-release-version
         with:
           tag: ${{ inputs.tagName }}
+
+      - name: Fetch attestation bundle
+        uses: ./.github/actions/fetch-attestation
+        with:
+          repo: hrzlgnm/mdns-tui-browser
+          tag: ${{ steps.pin.outputs.tag }}
+          asset: ${{ steps.pin.outputs.asset }}
 
       - name: Setup LXD
         uses: canonical/setup-lxd@8c6a87bfb56aa48f3fb9b830baa18562d8bfd4ee # v1
@@ -34,31 +42,9 @@ jobs:
         run: sudo snap install snapcraft --classic
         shell: bash
 
-      # Snapcraft with --use-lxd builds inside an LXD container and does not
-      # forward the host GH_TOKEN, and it treats build-environment values as
-      # literals (so a GH_TOKEN: ${GH_TOKEN} placeholder is not expanded and
-      # the build fails with "GH_TOKEN: unbound variable"). Substitute the
-      # real token as a literal into snapcraft.yaml here, on the runner where
-      # GH_TOKEN is available, before the build runs.
-      - name: Inject GH_TOKEN into snapcraft.yaml
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          python3 - <<'PY'
-          import os
-          p = "snap/snapcraft.yaml"
-          s = open(p).read()
-          placeholder = "GH_TOKEN: ${GH_TOKEN}"
-          assert placeholder in s, "snapcraft.yaml must contain the 'GH_TOKEN: ${GH_TOKEN}' placeholder"
-          s = s.replace(placeholder, f"GH_TOKEN: {os.environ['GH_TOKEN']}")
-          open(p, "w").write(s)
-          PY
-        shell: bash
-
       - name: Build snap
-        uses: hrzlgnm/actions/.github/actions/build-snap@v2.7.0
-        with:
-          verbosity: brief
+        run: sudo snapcraft pack --use-lxd --verbosity=brief
+        shell: bash
 
       - name: Upload snap artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
