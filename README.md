@@ -2,8 +2,10 @@
 
 Builds [mdns-tui-browser](https://github.com/hrzlgnm/mdns-tui-browser) as a
 Snap. The snap downloads the prebuilt upstream release tarball (which already
-contains the binary and man page) and verifies it against the inline sha256
-digest GitHub computes for the asset. This repository holds only packaging
+contains the binary and man page) and verifies its SLSA build provenance with
+`gh attestation verify` (offline bundle flow, cert pinned to
+`build-reusable.yml@refs/tags/${tag}`) — not an inline `sha256` digest (which
+a compromised publish step could rewrite). This repository holds only packaging
 metadata and CI.
 
 ## Install
