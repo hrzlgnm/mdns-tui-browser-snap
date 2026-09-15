@@ -56,12 +56,15 @@ parts:
       tar -xzf "$gh_tarball"
       gh_bin="$(pwd)/gh_${gh_ver}_linux_amd64/bin/gh"
 
+      # Upstream releases via release-please, so the build workflow runs on
+      # refs/heads/main (tagName is only an input); the attestation cert
+      # identity is therefore @refs/heads/main, not @refs/tags/${tag}.
       bundle="$(ls "$SNAPCRAFT_PROJECT_DIR"/sha256*.jsonl | head -1)"
       "$gh_bin" attestation verify release.tar.gz \
         --repo hrzlgnm/mdns-tui-browser \
         --bundle "$bundle" \
         --custom-trusted-root "$SNAPCRAFT_PROJECT_DIR/trusted_root.jsonl" \
-        --cert-identity "https://github.com/hrzlgnm/mdns-tui-browser/.github/workflows/build-reusable.yml@refs/tags/${tag}"
+        --cert-identity "https://github.com/hrzlgnm/mdns-tui-browser/.github/workflows/build-reusable.yml@refs/heads/main"
 
       root="${asset%.tar.gz}"
       tar xzf release.tar.gz
