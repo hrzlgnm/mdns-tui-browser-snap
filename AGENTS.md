@@ -78,7 +78,7 @@ bundle="$(ls "$SNAPCRAFT_PROJECT_DIR"/sha256*.jsonl | head -1)"
   --repo hrzlgnm/mdns-tui-browser \
   --bundle "$bundle" \
   --custom-trusted-root "$SNAPCRAFT_PROJECT_DIR/trusted_root.jsonl" \
-  --cert-identity "https://github.com/hrzlgnm/mdns-tui-browser/.github/workflows/build-reusable.yml@refs/tags/${tag}"
+  --cert-identity "https://github.com/hrzlgnm/mdns-tui-browser/.github/workflows/build-reusable.yml@refs/heads/main"
 ```
 
 - `core24`'s apt `gh` (2.45) predates the `attestation` subcommand, so the
@@ -88,7 +88,9 @@ bundle="$(ls "$SNAPCRAFT_PROJECT_DIR"/sha256*.jsonl | head -1)"
 - This is a **binary** attestation (over the tarball). Do **not** pass
   `--source-digest` here.
 - `cert-identity` pin:
-  `https://github.com/hrzlgnm/mdns-tui-browser/.github/workflows/build-reusable.yml@refs/tags/${tag}`
+  `https://github.com/hrzlgnm/mdns-tui-browser/.github/workflows/build-reusable.yml@refs/heads/main`
+  (upstream releases via release-please, so the workflow runs on `main` —
+  `tagName` is only an input, hence `@refs/heads/main`)
 
 ## CI structure
 
