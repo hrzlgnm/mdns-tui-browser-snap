@@ -1,3 +1,5 @@
+[![Release snap](https://github.com/hrzlgnm/mdns-tui-browser-snap/actions/workflows/release.yml/badge.svg)](https://github.com/hrzlgnm/mdns-tui-browser-snap/actions/workflows/release.yml)
+[![mdns-tui-browser](https://snapcraft.io/mdns-tui-browser/badge.svg)](https://snapcraft.io/mdns-tui-browser)
 # mdns-tui-browser snap
 
 Builds [mdns-tui-browser](https://github.com/hrzlgnm/mdns-tui-browser) as a
